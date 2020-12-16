@@ -1,0 +1,33 @@
+- hosts: all
+  tasks:
+   - name: installing httpd package
+     package: 
+      name: "httpd"
+      state: present
+
+   - name:  creating a directory for document root
+     file: 
+      state: directory
+      path: "/var/www/venky"
+
+   - name: chnaging the document root
+     template:
+            dest: "/etc/httpd/conf.d/venky.conf"
+            src: "venky.conf.j2"
+     notify: restarting webserver
+
+   - name: copying web pages
+     copy: 
+      dest: "/var/www/venky"
+      src: "index.html"
+
+   - name: starting the service
+     service: 
+      name: "httpd"
+      state: started
+      enabled: yes
+  handlers:
+     - name: restarting webserver
+       service:
+              name: "httpd"
+              state: restarted
